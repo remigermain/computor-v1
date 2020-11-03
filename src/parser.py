@@ -1,4 +1,4 @@
-from . import poly, utils
+from . import eq, utils
 import re
 import enum
 
@@ -128,8 +128,8 @@ class Parser:
                 degres = 1 if len(_split) != 2 else int(_split[1])
                 if _last_digit is None:
                     _last_digit = 1
-                data.append(poly.PolyPower(val, float(_last_digit),
-                                           degres, indefinite=self._inde))
+                data.append(eq.Power(val, float(_last_digit),
+                                     degres, indefinite=self._inde))
                 if degres > utils.MAX_DEGRES:
                     self.add_error(Error.ERR_MAX_DEGRES,
                                    length, len(val.strip()),
@@ -143,14 +143,14 @@ class Parser:
                     self.add_error(Error.ERR_NEED_NUMBER_BF_OPERA, length, len(
                         val.strip()), 'you need a number befor operator.')
                 if _last_digit is not None:
-                    data.append(poly.PolyPower(
+                    data.append(eq.Power(
                         val, float(_last_digit), 1, indefinite=self._inde))
-                data.append(poly.PolyOperande(val.strip()))
+                data.append(eq.Operande(val.strip()))
                 num, ope = False, True
 
             elif self.is_equal(val):
                 if _last_digit is not None:
-                    data.append(poly.PolyPower(
+                    data.append(eq.Power(
                         val, float(_last_digit), 1, indefinite=self._inde))
                 _last_digit = None
 
@@ -190,7 +190,7 @@ class Parser:
                                'Your math is wrong ...')
 
         if _last_digit is not None:
-            data.append(poly.PolyPower(_last_val, int(
+            data.append(eq.Power(_last_val, int(
                 _last_digit), 1, indefinite=self._inde))
 
         return not self.have_error

@@ -1,6 +1,9 @@
 from .utils import Color, MAX_DEGRES
-from .poly import PolyPower, PolyOperande
+from .eq import Power, Operande
+from .poly import get_poly_class
 
+
+# '\u221A1\u03056\u0305'
 
 class Resolver:
 
@@ -19,14 +22,24 @@ class Resolver:
     def poly_str(self, poly_list):
         return " ".join(str(d) for d in poly_list)
 
-    def verbose(self, info, message):
-        if self._verbose:
+    def verbose(self, info, message, force=False):
+        if self._verbose or force:
             print(f"{Color.YELLOW}{info.capitalize()}{Color.WHITE}:\n\t{message}\n")
 
-    def reduce_poly(self, list_poly):
-        new_poly = [list_poly[0]]
+    def _reduce(self):
+        new_after = [
+            obj
+            if obj.is_power else
+            Operande("-" if obj.is_plus() else "-")
+            for obj in self._after
+        ]
+        self._before.extend([Operande("-"), *new_after])
+
+        self.verbose("merge equation", self.poly_str(self._before) + " = 0")
+
+        new_poly = [self._before[0]]
         last_ope = None
-        for poly in list_poly[1:]:
+        for poly in self._before[1:]:
             if poly.is_operande:
                 last_ope = poly
             else:
@@ -41,8 +54,43 @@ class Resolver:
                         f[0].num -= poly.num
         return new_poly
 
+    def remove_poly(self, lst):
+        """
+            remove all poly with zero
+        """
+        new_lst = []
+
+        last = None
+        for nxt in lst:
+            if nxt.is_operande:
+                last = nxt
+            elif nxt.num != 0:
+                if not last:
+                    new_lst.append(nxt)
+                else:
+                    new_lst.extend([last, nxt])
+        if len(new_lst) == 0:
+            return [Power("0", 0.0, 0)]
+        return new_lst
+
+    def find_degres(self, lst):
+        _max = 0
+        for el in lst:
+            if el.is_power and el.degres > _max:
+                _max = el.degres
+        return _max
+
     def resolve(self):
-        self._before = self.reduce_poly(self._before)
-        self._after = self.reduce_poly(self._after)
-        self.verbose("reduce degres", self.poly_str(
-            self._before) + " = " + self.poly_str(self._after))
+        lst = self._reduce()
+        self.verbose("pre-reduce equation", self.poly_str(lst) + " = 0")
+
+        lst = self.remove_poly(lst)
+
+        self.verbose("reduce equation", self.poly_str(
+            lst) + " = 0", force=True)
+
+        degres = self.find_degres(lst)
+        self.verbose("Polynomial degree", degres, force=True)
+
+        poly = get_poly_class(degres)(lst, verbose=self._verbose)
+        poly.resolve()

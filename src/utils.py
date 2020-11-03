@@ -44,7 +44,7 @@ def print_results(results):
         if r['have_error']:
             error_line(r['parser'].line, r['parser']._errors)
         else:
-            print("NICE")
+            r['resolve'].resolve()
 
 
 def lst_poly_str(lst):

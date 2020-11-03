@@ -12,9 +12,7 @@ def parse_line(args, eq, idx=-1):
     obj = {'idx': idx, 'have_error': False}
     if parser.is_valid():
         data = parser.validated_data
-        resolve = Resolver(data, verbose=args.verbose)
-        resolve.resolve()
-        obj['resolve'] = resolve
+        obj['resolve'] = Resolver(data, verbose=args.verbose)
     else:
         obj['parser'] = parser
         obj['have_error'] = True
