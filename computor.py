@@ -1,6 +1,6 @@
 #!/bin/python3
 
-from src.utils import MAX_DEGRES, print_results, lst_poly_str, DEFAULT_INDEFINITE
+from src.utils import MAX_DEGRES, print_results, DEFAULT_INDEFINITE
 from src.parser import Parser
 from src.resolver import Resolver
 import argparse
@@ -12,11 +12,7 @@ def parse_line(args, eq, idx=-1):
     obj = {'idx': idx, 'have_error': False}
     if parser.is_valid():
         data = parser.validated_data
-
-        if args.verbose:
-            print(f"validated data:\n\t{lst_poly_str(data[0])} = {lst_poly_str(data[1])}")
-
-        resolve = Resolver(data)
+        resolve = Resolver(data, verbose=args.verbose)
         resolve.resolve()
         obj['resolve'] = resolve
     else:
@@ -53,9 +49,10 @@ def main():
     _argparse = argparse.ArgumentParser(
         "computor",
         "computor v1: [falgs] equations...",
-        f"résout une équation polynomiale de degré inférieur ou egale {MAX_DEGRES}"
+        f"solves a polynomial equation of lower or equal degree {MAX_DEGRES}"
     )
-    _argparse.add_argument("-v", "--verbose", action="store_true", default=False)
+    _argparse.add_argument(
+        "-v", "--verbose", action="store_true", default=False)
     _argparse.add_argument(
         "-d",
         "--define-indefinite",
