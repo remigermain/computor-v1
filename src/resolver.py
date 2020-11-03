@@ -42,7 +42,7 @@ class Resolver:
         return new_poly
 
     def resolve(self):
-        new_bf = self.reduce_poly(self._before)
-        new_af = self.reduce_poly(self._after)
+        self._before = self.reduce_poly(self._before)
+        self._after = self.reduce_poly(self._after)
         self.verbose("reduce degres", self.poly_str(
-            new_bf) + " = " + self.poly_str(new_af))
+            self._before) + " = " + self.poly_str(self._after))

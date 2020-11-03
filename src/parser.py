@@ -30,7 +30,7 @@ class Parser:
         self.line = self.re_space.sub(" ", line)
 
     def _init_regex(self):
-        REG_DIGIT = r'\s*-?\s*\d+\s*'
+        REG_DIGIT = r'\s*-?\s*\d+(?:\.\d+)?\s*'
         LETTER = "{ind1}{ind2}".format(
             ind1=self._inde.upper(), ind2=self._inde.lower())
         REG_LETTER = r'\s*[' + LETTER + r']\s*'
@@ -107,7 +107,9 @@ class Parser:
             _last_val = val
 
             # if is space of empty string , pass
-            if not val or val.isspace():
+            if not val:
+                continue
+            if val.isspace():
                 pass
 
             # if is digit , add in last_digit for waiting the next value
@@ -126,7 +128,7 @@ class Parser:
                 degres = 1 if len(_split) != 2 else int(_split[1])
                 if _last_digit is None:
                     _last_digit = 1
-                data.append(poly.PolyPower(val, int(_last_digit),
+                data.append(poly.PolyPower(val, float(_last_digit),
                                            degres, indefinite=self._inde))
                 if degres > utils.MAX_DEGRES:
                     self.add_error(Error.ERR_MAX_DEGRES,
@@ -142,14 +144,14 @@ class Parser:
                         val.strip()), 'you need a number befor operator.')
                 if _last_digit is not None:
                     data.append(poly.PolyPower(
-                        val, int(_last_digit), 1, indefinite=self._inde))
+                        val, float(_last_digit), 1, indefinite=self._inde))
                 data.append(poly.PolyOperande(val.strip()))
                 num, ope = False, True
 
             elif self.is_equal(val):
                 if _last_digit is not None:
                     data.append(poly.PolyPower(
-                        val, int(_last_digit), 1, indefinite=self._inde))
+                        val, float(_last_digit), 1, indefinite=self._inde))
                 _last_digit = None
 
                 if ope:
@@ -174,7 +176,6 @@ class Parser:
                 print(val)
                 self.add_error(Error.ERR_UNK, length, len(
                     val.strip()), 'unknow type.')
-
             length += len(val)
 
         if not self.have_error:

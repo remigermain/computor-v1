@@ -123,7 +123,8 @@ class Test(unittest.TestCase):
         ])
 
     def test_only_num_with_exposant_with_num_with_multiple(self):
-        parser = Parser("1 * X^1 + 5 * X ^  1 - -9 * X ^ 0 = 48 * X ^2 + -18X ^  2")
+        parser = Parser(
+            "1 * X^1 + 5 * X ^  1 - -9 * X ^ 0 = 48 * X ^2 + -18X ^  2")
         self.assertTrue(parser.is_valid())
         vd_b, vd_a = parser.validated_data
         self.assertParseEqual(vd_b, [
@@ -140,7 +141,8 @@ class Test(unittest.TestCase):
         ])
 
     def test_only_num_with_exposant_with_num_with_multiple2(self):
-        parser = Parser("1 * X^1 + 5 * X ^  1 - -9 * X ^ 0  - 1 * X^1 + 5 * X ^  1 - -9 * X ^ 0 = 1 * X^1 + 5 * X ^  1 - -9 * X ^ 0 + 48 * X ^2 + -18X ^  2")
+        parser = Parser(
+            "1 * X^1 + 5 * X ^  1 - -9 * X ^ 0  - 1 * X^1 + 5 * X ^  1 - -9 * X ^ 0 = 1 * X^1 + 5 * X ^  1 - -9 * X ^ 0 + 48 * X ^2 + -18X ^  2")
         self.assertTrue(parser.is_valid())
         vd_b, vd_a = parser.validated_data
         self.assertParseEqual(vd_b, [
@@ -203,6 +205,13 @@ class Test(unittest.TestCase):
     def test_negative_number(self):
         parser = Parser("1= -9X")
         self.assertTrue(parser.is_valid())
+
+    def test_float(self):
+        parser = Parser("5.6 * X^2 = -9X")
+        self.assertTrue(parser.is_valid())
+        vd_b, vd_a = parser.validated_data
+        self.assertParseEqual(vd_b, [{'num': 5.6, 'degres': 2}])
+        self.assertParseEqual(vd_a, [{'num': -9.0, 'degres': 1}])
 
 
 if __name__ == '__main__':

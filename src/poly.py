@@ -28,7 +28,7 @@ class PolyOperande(Poly):
 class PolyPower(Poly):
     is_power = True
 
-    def __init__(self, value, num, degres, indefinite=DEFAULT_INDEFINITE):
+    def __init__(self, value, num: float, degres: int, indefinite=DEFAULT_INDEFINITE):
         self.value = value
         self.num = num
         self.degres = degres
