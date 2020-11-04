@@ -37,7 +37,7 @@ class Error:
         l_strip = value.lstrip()
         op = {
             "start": start + (len(value) - len(l_strip)),
-            "padding": len(l_strip),
+            "padding": len(l_strip.strip()),
             "message": self.get_message(idx)
         }
         if idx not in self._errors:

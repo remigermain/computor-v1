@@ -1,6 +1,11 @@
 from .utils import Color
 
 
+class Result:
+    ANY_POSSIBILITY = "ANY_POSSIBILITY"
+    NO_SOLUTION = "NO_SOLUTION"
+
+
 class Poly:
 
     def __init__(self, data, verbose=False, no_print=False):
@@ -48,10 +53,10 @@ class Poly0(Poly):
         b = self.get_num_degres(0)
         if b == 0:
             self.print("\tall solution are possible.")
-            return "ALL"
+            return Result.ANY_POSSIBILITY
         else:
             self.print("\the have no solution.")
-            return "NO"
+            return Result.NO_SOLUTION
 
 
 class Poly1(Poly):
@@ -63,7 +68,7 @@ class Poly1(Poly):
         a = self.get_num_degres(1)
         b = self.get_num_degres(0)
 
-        solution = -b / a if a != 0 else "ALL"
+        solution = -b / a if a != 0 else Result.ANY_POSSIBILITY
         self.verbose(
             "calculate",
             f"\ta = {a}\n"
@@ -98,7 +103,7 @@ class Poly2(Poly):
                            f"delta is lower than 0 ({ delta }), no solution possible."
                            )
         self.print("\tx = \u2205")
-        return "NO"
+        return Result.NO_SOLUTION
 
     def delta_zero(self, a, b, c):
         self.verbose_force("result", "delta is 0, only one solution")

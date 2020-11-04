@@ -1,5 +1,6 @@
 from src.parser import Parser
 from src.resolver import Resolver
+from src.poly import Result
 import unittest
 
 
@@ -20,11 +21,20 @@ class Test(unittest.TestCase):
 
     def test_division_zero(self):
         result = self.get_result_from("x = x")
-        self.assertEqual("ALL", result)
+        self.assertEqual(Result.ANY_POSSIBILITY, result)
+
+    def test_any(self):
+        result = self.get_result_from("-0*x^0 = 0")
+        self.assertEqual(Result.ANY_POSSIBILITY, result)
+
+    def test_any2(self):
+        result = self.get_result_from(
+            "-1*x ^ 1 - -1*x ^ 1 = 2*x ^ 1 + - 1*x ^ 1 - 1*x ^ 1")
+        self.assertEqual(Result.ANY_POSSIBILITY, result)
 
     def test_impossible(self):
-        result = self.get_result_from("2x = x")
-        self.assertEqual(0, result)
+        result = self.get_result_from("5 * X^0 + 0 * X^1 = 4 * X^0")
+        self.assertEqual(Result.NO_SOLUTION, result)
 
     def test_pdf(self):
         result = self.get_result_from(
@@ -42,17 +52,30 @@ class Test(unittest.TestCase):
 
     def test_pdf4(self):
         result = self.get_result_from("42 * X ^ 0 = 42 ∗ X ^ 0")
-        self.assertEqual("ALL", result)
+        self.assertEqual(Result.ANY_POSSIBILITY, result)
 
     def test_eq(self):
         result = self.get_result_from("4 * X^0 + 3 * X^1 + X^2 = 0")
-        self.assertEqual("ALL", result)
+        self.assertEqual(Result.ANY_POSSIBILITY, result)
 
     def test_eq2(self):
         result = self.get_result_from(
             "1.5 * X ^ 1 + 8.3 * X ^ 2 - 2 * X ^ 0 = -4.1 * X ^ 1 + 2 * X ^ 0")
         self.assertEqual(-1.10919, round(result[0], 5))
         self.assertEqual(0.434488, round(result[1], 6))
+
+    def test_eq3(self):
+        result = self.get_result_from("6 * X ^ 0 + -4 * X ^ 2=1 * X ^ 0")
+        self.assertEqual(1.118, round(result[0], 3))
+        self.assertEqual(-1.118, round(result[1], 3))
+
+    def test_eq4(self):
+        result = self.get_result_from("2x = x")
+        self.assertEqual(0, result)
+
+    def test_eq5(self):
+        result = self.get_result_from("4*x^2 = 4*x^2 + 1*x^1 - 1*x^1")
+        self.assertEqual(Result.ANY_POSSIBILITY, result)
 
 
 if __name__ == '__main__':
