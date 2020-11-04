@@ -12,7 +12,8 @@ def parse_line(args, eq, idx=-1):
     obj = {'idx': idx, 'have_error': False}
     if parser.is_valid():
         data = parser.validated_data
-        obj['resolve'] = Resolver(data, verbose=args.verbose)
+        obj['resolve'] = Resolver(
+            data, verbose=args.verbose, no_print=args.only_result)
     else:
         obj['parser'] = parser
         obj['have_error'] = True
@@ -26,14 +27,12 @@ def validate_indefinite(value):
 
 
 def from_stdin(args):
-    results = []
     try:
         line = input()
     except KeyboardInterrupt:
         print("exit program ...")
         exit(-1)
-    results.append(parse_line(args, line))
-    print_results(results)
+    print_results([parse_line(args, line)])
 
 
 def from_args(args):
@@ -51,6 +50,8 @@ def main():
     )
     _argparse.add_argument(
         "-v", "--verbose", action="store_true", default=False)
+    _argparse.add_argument(
+        "-o", "--only-result", action="store_true", default=False)
     _argparse.add_argument(
         "-d",
         "--define-indefinite",

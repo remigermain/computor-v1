@@ -132,7 +132,7 @@ class Parser:
 
                 # if number is alone (not power set), the default power is 0
                 if l_digit is not None:
-                    data.append(eq.Power(l_digit, indefinite=self._inde))
+                    data.append(eq.Power(l_digit, 0, indefinite=self._inde))
 
                 data.append(eq.Operande(val.strip()))
                 num, ope = False, True
@@ -174,7 +174,7 @@ class Parser:
                 self.add_error(Error.ERR_MATH_WRONG)
 
         if l_digit is not None:
-            data.append(eq.Power(l_digit, 1, indefinite=self._inde))
+            data.append(eq.Power(l_digit, 0, indefinite=self._inde))
 
         return not self.have_error
 

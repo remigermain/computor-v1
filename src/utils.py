@@ -44,11 +44,15 @@ def error_line(line, errors):
 
 
 def print_results(results):
+    new_line = False
     for r in results:
+        if new_line:
+            print("\n")
         if r['have_error']:
             error_line(r['parser'].line, r['parser']._errors)
         else:
             r['resolve'].resolve()
+        new_line = True
 
 
 def lst_poly_str(lst):

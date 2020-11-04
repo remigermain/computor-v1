@@ -7,10 +7,11 @@ from .poly import get_poly_class
 
 class Resolver:
 
-    def __init__(self, data, verbose=False):
+    def __init__(self, data, verbose=False, no_print=False):
         self._before = data[0]
         self._after = data[1]
         self._verbose = verbose
+        self._no_print = no_print
         self.verbose("normalize equation",
                      self.poly_str(self._before) + " = " +
                      self.poly_str(self._after)
@@ -23,7 +24,7 @@ class Resolver:
         return " ".join(str(d) for d in poly_list)
 
     def verbose(self, info, message, force=False):
-        if self._verbose or force:
+        if (self._verbose or force) and not self._no_print:
             print(f"{Color.YELLOW}{info.capitalize()}{Color.WHITE}:\n\t{message}\n")
 
     def _reduce(self):
@@ -92,5 +93,6 @@ class Resolver:
         degres = self.find_degres(lst)
         self.verbose("Polynomial degree", degres, force=True)
 
-        poly = get_poly_class(degres)(lst, verbose=self._verbose)
+        poly = get_poly_class(degres)(
+            lst, verbose=self._verbose, no_print=self._no_print)
         poly.resolve()
