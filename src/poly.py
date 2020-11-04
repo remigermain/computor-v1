@@ -19,22 +19,15 @@ class Poly:
         if not self._no_print:
             print(*args)
 
-    def only_result(self, *args):
-        if self._no_print:
-            print(*args)
-
-    def get_poly_degres(self, degres):
+    def get_poly_degres(self, degres) -> float:
         last = None
         for poly in self.data:
             if poly.is_operande:
                 last = poly
             elif poly.degres == degres:
-                if last and not last.is_plus():
-                    num = -1
-                else:
-                    num = 1
+                num = -1 if last and not last.is_plus() else 1
                 return poly.num * num
-        return 0
+        return 0.0
 
     def sqrt(self, num):
         n = 1
@@ -52,11 +45,13 @@ class Poly0(Poly):
     """
 
     def resolve(self):
-        # TODO
-        if not self._no_print:
-            print("\tall solution are possible.")
+        b = self.get_poly_degres(0)
+        if b == 0:
+            self.print("\tall solution are possible.")
+            return "ALL"
         else:
-            print("NO")
+            self.print("\the have no solution.")
+            return "NO"
 
 
 class Poly1(Poly):
@@ -68,13 +63,17 @@ class Poly1(Poly):
         a = self.get_poly_degres(1)
         b = self.get_poly_degres(0)
 
-        solution = -b / a
+        solution = -b / a if a != 0 else 0
         self.verbose(
             "calculate",
-            f"a = {a}\n\tb = {b}\n\n\t"
-            f"x\u00B9 = (-b / a) = ({-b} / {a})\n\tx\u00B9 = {solution}"
+            f"\ta = {a}\n"
+            f"\tb = {b}\n\n"
+            "\tx\u00B9 = (-b / a)\n"
+            f"\tx\u00B9 = ({-b} / {a})\n"
+            f"\tx\u00B9 = {solution}"
         )
         self.print(f"\tsolution is \u2A10 = {solution}")
+        return solution
 
 
 class Poly2(Poly):
@@ -90,21 +89,27 @@ class Poly2(Poly):
                            f"delta is lower than 0 ({ delta }), no solution possible."
                            )
         self.print("\tx = \u2205")
-        self.only_result("NO")
+        return "NO"
 
     def delta_zero(self, a, b, c):
         self.verbose_force("result", "delta is 0, only one solution")
-        self.print(f"\tx\u2070 =  -b  / ( 2 x a ) = {-b} / ( 2 x {a} ) ")
         solution = -b / (2 * a) if a != 0 else 0
+        self.print(
+            f"\tx\u2070 = -b / ( 2 * a )\n"
+            f"\tx\u2070 = {-b} / ( 2 * {a} )\n"
+            f"\tx\u2070 = {solution}"
+        )
         self.print(f"\n\tsolution is \u2A10 = {solution}")
-        self.only_result(solution)
+        return solution
 
     def delta_positive(self, delta, a, b, c):
         self.verbose_force(
             "result", "delta is upper than 0, you have 2 solution")
         delta_sq = self.sqrt(delta)
 
-        eq = "\tx{res} = (-b {sign} \u221A\u0394) / (2 x a) = ({b} {sign} \u221A{delta}) / (2 x {a})"
+        eq = "\tx{res} = (-b {sign} \u221A\u0394) / (2 * a)\n"\
+             "\tx{res} = ({b} {sign} \u221A{delta}) / (2 * {a})"
+
         data = {
             'a': a,
             'b': b,
@@ -124,8 +129,7 @@ class Poly2(Poly):
 
         # resume solution
         self.print("\n\tsolution is \u2A10{ " + f"{x1} ; {x2}" + " }")
-        self.only_result(x1)
-        self.only_result(x2)
+        return [x1, x2]
 
     def resolve(self):
         a = self.get_poly_degres(2)
@@ -133,17 +137,19 @@ class Poly2(Poly):
         c = self.get_poly_degres(0)
 
         delta = self.calcul_delta(a, b, c)
-        veb = f"a = {a}\n\tb = {b}\n\tc = {c}\n\n\t"
-        veb += f"\u0394 delta = (b\u00B2 - 4) * a * c = ({b}\u00B2 - 4) * {a} * {c}\n\t\u0394 delta = {delta}"
+        veb = f"a = {a}\n\tb = {b}\n\tc = {c}\n\n" \
+              f"\t\u0394 = (b\u00B2 - 4) * a * c\n" \
+              f"\t\u0394 = ({b}\u00B2 - 4) * {a} * {c}\n" \
+              f"\t\u0394 = {delta}"
         self.verbose("calculate delta", veb)
 
         # call respective solution
         if delta < 0:
-            self.delta_negative(delta)
+            return self.delta_negative(delta)
         elif delta == 0:
-            self.delta_zero(a, b, c)
+            return self.delta_zero(a, b, c)
         else:
-            self.delta_positive(delta, a, b, c)
+            return self.delta_positive(delta, a, b, c)
 
 
 def get_poly_class(degres): return eval(f"Poly{degres}")

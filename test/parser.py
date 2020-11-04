@@ -12,14 +12,6 @@ class Test(unittest.TestCase):
                 self.assertEqual(el1.num, el2['num'])
                 self.assertEqual(el1.degres, el2['degres'])
 
-    def test_multiple_equal(self):
-        parser = Parser("1x^1 =1x^1 =1x^1 ")
-        self.assertFalse(parser.is_valid())
-
-    def test_no_equal(self):
-        parser = Parser("1x^1 1x^1 1x^1 ")
-        self.assertFalse(parser.is_valid())
-
     def test_maj_indefinite(self):
         parser = Parser("1x^1 = 1X^1")
         self.assertTrue(parser.is_valid())
@@ -41,16 +33,16 @@ class Test(unittest.TestCase):
         self.assertTrue(parser.is_valid())
         vd_b, vd_a = parser.validated_data
         self.assertParseEqual(vd_b, [
-            {'num': 5, 'degres': 1},
+            {'num': 5, 'degres': 0},
             {'value': '+'},
-            {'num': 5, 'degres': 1},
+            {'num': 5, 'degres': 0},
             {'value': '-'},
-            {'num': -5, 'degres': 1},
+            {'num': -5, 'degres': 0},
         ])
         self.assertParseEqual(vd_a, [
-            {'num': 55, 'degres': 1},
+            {'num': 55, 'degres': 0},
             {'value': '+'},
-            {'num': 48, 'degres': 1},
+            {'num': 48, 'degres': 0},
         ])
 
     def test_only_exposant(self):
@@ -212,6 +204,14 @@ class Test(unittest.TestCase):
         vd_b, vd_a = parser.validated_data
         self.assertParseEqual(vd_b, [{'num': 5.6, 'degres': 2}])
         self.assertParseEqual(vd_a, [{'num': -9.0, 'degres': 1}])
+
+    def test_multiple_equal(self):
+        parser = Parser("1x^1 =1x^1 1x^1")
+        self.assertFalse(parser.is_valid())
+
+    def test_no_equal(self):
+        parser = Parser("1x^1 1x^1 1x^1 ")
+        self.assertFalse(parser.is_valid())
 
 
 if __name__ == '__main__':

@@ -1,19 +1,16 @@
 from . import eq, utils, error
 import re
 
-re_space = re.compile(r"\s+")
-Error = error.Error()
-
 
 class Parser:
 
     _valid = None
-    _errors = []
 
     def __init__(self, line, indefinite=utils.DEFAULT_INDEFINITE):
         self._inde = indefinite
         self._init_regex()
         self.line = self.re_space.sub(" ", line)
+        self.errors = error.Error(self.line)
 
     def _init_regex(self):
         # TODO fix negative number
@@ -43,7 +40,10 @@ class Parser:
 
     @property
     def have_error(self):
-        return len(self._errors) != 0
+        return len(self.errors) != 0
+
+    def get_errors(self):
+        return self.errors
 
     def is_digit(self, value):
         return True if self.re_is_digit.match(value) else False
@@ -66,27 +66,15 @@ class Parser:
     def split(self, line):
         return self.re_split.split(line)
 
-    def add_error(self, error_type, start=-1, _str="", **kwargs):
-        l_strip = _str.lstrip()
-        op = {
-            "start": start + (len(_str) - len(l_strip)),
-            "padding": len(l_strip),
-            "message": Error.get_message(error_type, **kwargs)
-        }
-        if error_type not in self._errors:
-            self._errors[error_type] = [op]
-        else:
-            self._errors[error_type].append(op)
-
     def _parse(self, line):
-        self._errors = {}
+        self.errors.reset()
 
         if not line or line.isspace():
-            self.add_error(Error.ERR_EMPTY, 0, 0)
+            self.errors.add_error(self.errors.ERR_EMPTY, 0)
             return False
 
-        self._befor_data, self._after_data = [], []  # data before and after equal
-        data = self._befor_data
+        self._first_data, self._second_data = [], []  # data before and after equal
+        data = self._first_data
 
         # boolean to know order in parsing
         num, ope, equal, mult = [False] * 4
@@ -102,7 +90,8 @@ class Parser:
             # if is digit , add in last_digit for waiting the next value
             elif self.is_digit(val):
                 if num:
-                    self.add_error(Error.ERR_NEED_OPERA, length, val)
+                    self.errors.add_error(
+                        self.errors.ERR_NEED_OPERA, length, val)
 
                 # keep last digit, is will be set in operand or power
                 l_digit = float(val.replace(' ', ''))
@@ -119,8 +108,8 @@ class Parser:
 
                 # degres c'ant be upper than max degres
                 if degres > utils.MAX_DEGRES:
-                    self.add_error(Error.ERR_MAX_DEGRES, length,
-                                   val, degres=utils.MAX_DEGRES)
+                    self.errors.add_error(
+                        self.errors.ERR_MAX_DEGRES, length, val)
                 data.append(eq.Power(l_digit, degres, indefinite=self._inde))
 
                 l_digit = None
@@ -128,7 +117,8 @@ class Parser:
 
             elif self.is_operande(val):
                 if not num or ope:
-                    self.add_error(Error.ERR_NEED_NUMBER_BF_OPERA, length, val)
+                    self.errors.add_error(
+                        self.errors.ERR_NEED_NUMBER_BF_OPERA, length, val)
 
                 # if number is alone (not power set), the default power is 0
                 if l_digit is not None:
@@ -145,33 +135,36 @@ class Parser:
 
                 # assign error
                 if ope:
-                    self.add_error(Error.ERR_NEED_NUMBER_AF_OPERA, length, val)
+                    self.errors.add_error(
+                        self.errors.ERR_NEED_NUMBER_AF_OPERA, length, val)
                 elif equal:
-                    self.add_error(Error.ERR_UNK, length, val)
+                    self.errors.add_error(self.errors.ERR_UNK, length, val)
                 elif not len(data):
-                    self.add_error(Error.ERR_NOTHING_BF_EQUAL, length, val)
+                    self.errors.add_error(
+                        self.errors.ERR_NOTHING_BF_EQUAL, length, val)
 
-                data = self._after_data
+                data = self._second_data
                 equal, num, ope = True, False, False
 
             elif self.is_mult(val):
                 if not num or ope:
-                    self.add_error(Error.ERR_NEED_NUMBER_BF_OPERA, length, val)
+                    self.errors.add_error(
+                        self.errors.ERR_NEED_NUMBER_BF_OPERA, length, val)
                 ope = True
 
             else:
                 # unknow type in line
-                self.add_error(Error.ERR_UNK, length, val)
+                self.errors.add_error(self.errors.ERR_UNK, length, val)
 
             length += len(val)
 
         if not self.have_error:
             if not equal:
-                self.add_error(Error.ERR_MISSING_EQ)
+                self.errors.add_error(self.errors.ERR_MISSING_EQ)
             if ope:
-                self.add_error(Error.ERR_ENDING_OPE)
+                self.errors.add_error(self.errors.ERR_ENDING_OPE)
             if not num:
-                self.add_error(Error.ERR_MATH_WRONG)
+                self.errors.add_error(self.errors.ERR_MATH_WRONG)
 
         if l_digit is not None:
             data.append(eq.Power(l_digit, 0, indefinite=self._inde))
@@ -179,7 +172,8 @@ class Parser:
         return not self.have_error
 
     def is_valid(self):
-        self._valid = self._parse(self.line)
+        if self._valid is None:
+            self._valid = self._parse(self.line)
         return self._valid
 
     @property
@@ -190,4 +184,4 @@ class Parser:
         if self._valid is False:
             raise ValueError("you c'ant access validated data is not valid")
 
-        return self._befor_data, self._after_data
+        return self._first_data, self._second_data
