@@ -23,19 +23,23 @@ def error_line(line, errors):
     for key in errors:
         if new_line:
             print("")
-        print('\t' + line)
+        if line:
+            print('\t' + line)
         last = 0
         space = ""
         messages = []
         for err in errors[key]:
             space += " " * (err['start'] - last)
             last = err['start'] + err['padding']
-            space += Color.RED + ("^" * err['padding']) + Color.WHITE
-
+            padd = "^" * err['padding']
+            if len(padd):
+                space += Color.RED + padd + Color.WHITE
             if err['message'] not in messages:
                 messages.append(err['message'])
         mess = '\n'.join(messages)
-        print(f"\t{space}\n{mess}")
+        if space:
+            print(f"\t{space}")
+        print(f"\t{mess}")
         new_line = True
 
 

@@ -5,7 +5,7 @@ class Eq:
     is_operande = False
     is_power = False
 
-    def __init__(self, value):
+    def __init__(self, value: str):
         self.value = value
 
     def __str__(self):
@@ -28,8 +28,7 @@ class Operande(Eq):
 class Power(Eq):
     is_power = True
 
-    def __init__(self, value, num: float, degres: int, indefinite=DEFAULT_INDEFINITE):
-        self.value = value
+    def __init__(self, num: float, degres: int = 0, indefinite=DEFAULT_INDEFINITE):
         self.num = num
         self.degres = degres
         self.indefinite = indefinite

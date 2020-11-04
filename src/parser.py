@@ -1,22 +1,8 @@
-from . import eq, utils
+from . import eq, utils, error
 import re
-import enum
 
 re_space = re.compile(r"\s+")
-
-Error = enum.Enum('Error', (
-    "ERR_EMPTY",
-    "ERR_NEED_OPERA",
-    "ERR_MAX_DEGRES",
-    "ERR_NEED_NUMBER_BF_OPERA",
-    "ERR_NEED_NUMBER_AF_OPERA",
-    "ERR_UNK",
-    "ERR_NOTHING_BF_EQUAL",
-    "ERR_MISSING_EQ",
-    "ERR_ENDING_OPE",
-    "ERR_MATH_WRONG"
-)
-)
+Error = error.Error()
 
 
 class Parser:
@@ -30,6 +16,7 @@ class Parser:
         self.line = self.re_space.sub(" ", line)
 
     def _init_regex(self):
+        # TODO fix negative number
         REG_DIGIT = r'\s*-?\s*\d+(?:\.\d+)?\s*'
         LETTER = "{ind1}{ind2}".format(
             ind1=self._inde.upper(), ind2=self._inde.lower())
@@ -46,7 +33,7 @@ class Parser:
 
         self.re_is_indefinite = re.compile(REG_LETTER)
 
-        self.re_is_operande = re.compile(r'^\s*[-+]\s*$')
+        self.re_is_operande = re.compile(r'^\s*[-+−]\s*$')
         self.re_is_equal = re.compile(r"^=$")
 
         self.re_is_power = re.compile(
@@ -79,11 +66,12 @@ class Parser:
     def split(self, line):
         return self.re_split.split(line)
 
-    def add_error(self, error_type, start, padding, message):
+    def add_error(self, error_type, start=-1, _str="", **kwargs):
+        l_strip = _str.lstrip()
         op = {
-            "start": start,
-            "padding": padding,
-            "message": message
+            "start": start + (len(_str) - len(l_strip)),
+            "padding": len(l_strip),
+            "message": Error.get_message(error_type, **kwargs)
         }
         if error_type not in self._errors:
             self._errors[error_type] = [op]
@@ -92,106 +80,101 @@ class Parser:
 
     def _parse(self, line):
         self._errors = {}
+
         if not line or line.isspace():
-            self.add_error(Error.ERR_EMPTY, 0, 0, 'String is empty')
+            self.add_error(Error.ERR_EMPTY, 0, 0)
             return False
 
         self._befor_data, self._after_data = [], []  # data before and after equal
         data = self._befor_data
 
+        # boolean to know order in parsing
         num, ope, equal, mult = [False] * 4
-        _last_digit, _last_val = [None] * 2
+        l_digit = None
+
+        # lenght line for error
         length = 0
-
         for val in self.split(line):
-            _last_val = val
-
             # if is space of empty string , pass
-            if not val:
-                continue
-            if val.isspace():
+            if val.isspace() or not len(val):
                 pass
 
             # if is digit , add in last_digit for waiting the next value
             elif self.is_digit(val):
                 if num:
-                    self.add_error(Error.ERR_NEED_OPERA,
-                                   length, len(val.strip()),
-                                   'you need a operator between number.'
-                                   )
+                    self.add_error(Error.ERR_NEED_OPERA, length, val)
 
-                _last_digit = val.replace(' ', '')
+                # keep last digit, is will be set in operand or power
+                l_digit = float(val.replace(' ', ''))
                 num, ope = True, False
 
             elif self.is_power(val):
+                # split power , if power have not exposant , default is 1
                 _split = val.split("^")
                 degres = 1 if len(_split) != 2 else int(_split[1])
-                if _last_digit is None:
-                    _last_digit = 1
-                data.append(eq.Power(val, float(_last_digit),
-                                     degres, indefinite=self._inde))
+
+                # if power has not number , default is 1
+                if l_digit is None:
+                    l_digit = 1
+
+                # degres c'ant be upper than max degres
                 if degres > utils.MAX_DEGRES:
-                    self.add_error(Error.ERR_MAX_DEGRES,
-                                   length, len(val.strip()),
-                                   f'your degres is upper than {utils.MAX_DEGRES}, c\'ant be resolve.'
-                                   )
-                _last_digit = None
+                    self.add_error(Error.ERR_MAX_DEGRES, length,
+                                   val, degres=utils.MAX_DEGRES)
+                data.append(eq.Power(l_digit, degres, indefinite=self._inde))
+
+                l_digit = None
                 num, ope = True, False
 
             elif self.is_operande(val):
                 if not num or ope:
-                    self.add_error(Error.ERR_NEED_NUMBER_BF_OPERA, length, len(
-                        val.strip()), 'you need a number befor operator.')
-                if _last_digit is not None:
-                    data.append(eq.Power(
-                        val, float(_last_digit), 1, indefinite=self._inde))
+                    self.add_error(Error.ERR_NEED_NUMBER_BF_OPERA, length, val)
+
+                # if number is alone (not power set), the default power is 0
+                if l_digit is not None:
+                    data.append(eq.Power(l_digit, indefinite=self._inde))
+
                 data.append(eq.Operande(val.strip()))
                 num, ope = False, True
 
             elif self.is_equal(val):
-                if _last_digit is not None:
-                    data.append(eq.Power(
-                        val, float(_last_digit), 1, indefinite=self._inde))
-                _last_digit = None
+                # append last digit with default power
+                if l_digit is not None:
+                    data.append(eq.Power(l_digit, 0, indefinite=self._inde))
+                    l_digit = None
 
+                # assign error
                 if ope:
-                    self.add_error(Error.ERR_NEED_NUMBER_AF_OPERA, length, len(
-                        val.strip()), 'you need a number after operator.')
+                    self.add_error(Error.ERR_NEED_NUMBER_AF_OPERA, length, val)
                 elif equal:
-                    self.add_error(Error.ERR_UNK, length, len(
-                        val.strip()), 'unknow type.')
+                    self.add_error(Error.ERR_UNK, length, val)
                 elif not len(data):
-                    self.add_error(Error.ERR_NOTHING_BF_EQUAL, length, len(
-                        val.strip()), 'he have nothing before equal ...')
+                    self.add_error(Error.ERR_NOTHING_BF_EQUAL, length, val)
+
                 data = self._after_data
                 equal, num, ope = True, False, False
 
             elif self.is_mult(val):
                 if not num or ope:
-                    self.add_error(Error.ERR_NEED_NUMBER_BF_OPERA, length, len(
-                        val.strip()), 'you need a number befor operator.')
+                    self.add_error(Error.ERR_NEED_NUMBER_BF_OPERA, length, val)
                 ope = True
 
             else:
-                print(val)
-                self.add_error(Error.ERR_UNK, length, len(
-                    val.strip()), 'unknow type.')
+                # unknow type in line
+                self.add_error(Error.ERR_UNK, length, val)
+
             length += len(val)
 
         if not self.have_error:
             if not equal:
-                self.add_error(Error.ERR_MISSING_EQ, 0,
-                               length, 'missing equal.')
+                self.add_error(Error.ERR_MISSING_EQ)
             if ope:
-                self.add_error(Error.ERR_ENDING_OPE, 0, length,
-                               'a calcul c\'ant ending by operator.')
+                self.add_error(Error.ERR_ENDING_OPE)
             if not num:
-                self.add_error(Error.ERR_MATH_WRONG, 0, length,
-                               'Your math is wrong ...')
+                self.add_error(Error.ERR_MATH_WRONG)
 
-        if _last_digit is not None:
-            data.append(eq.Power(_last_val, int(
-                _last_digit), 1, indefinite=self._inde))
+        if l_digit is not None:
+            data.append(eq.Power(l_digit, 1, indefinite=self._inde))
 
         return not self.have_error
 
@@ -205,6 +188,6 @@ class Parser:
             raise ValueError(
                 "you c'ant access validated data before running is_valid()")
         if self._valid is False:
-            raise ValueError("you c'ant access validated with valid is False")
+            raise ValueError("you c'ant access validated data is not valid")
 
         return self._befor_data, self._after_data
