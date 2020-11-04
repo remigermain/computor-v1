@@ -42,6 +42,7 @@ class Resolver:
 
         new_poly = [self._first_data[0]]
         last_ope = None
+
         for poly in self._first_data[1:]:
             if poly.is_operande:
                 last_ope = poly
@@ -51,7 +52,9 @@ class Resolver:
                 if not f:
                     new_poly.extend([last_ope, poly])
                 else:
-                    if last_ope.is_plus():
+                    idx = new_poly.index(f[0])
+                    is_plus = idx == 0 or new_poly[idx - 1].is_plus()
+                    if is_plus == last_ope.is_plus():
                         f[0].num += poly.num
                     else:
                         f[0].num -= poly.num
@@ -88,6 +91,7 @@ class Resolver:
 
     def resolve(self):
         self._final_reduce = self._reduce()
+
         self.verbose(
             "pre-reduce equation",
             self.poly_str(self._final_reduce) + " = 0"

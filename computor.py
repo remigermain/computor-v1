@@ -1,4 +1,4 @@
-#!/bin/python3
+#!/usr/bin/python3
 
 from src.utils import MAX_DEGRES, DEFAULT_INDEFINITE
 from src.parser import Parser
@@ -57,12 +57,11 @@ def from_stdin(args):
             print("")
         try:
             line = input("enter your equation:  ")
-        except (KeyboardInterrupt, EOFError):
+            if line.lower().strip() in ["break", "quit"]:
+                exit(1)
+        except (KeyboardInterrupt, EOFError, UnboundLocalError):
             print("exit program ...")
             exit(-1)
-        finally:
-            if line.lower().strip() == "break":
-                exit(1)
         print_results(args, [parse_line(args, line)])
         new_line = True
 

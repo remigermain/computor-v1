@@ -61,7 +61,7 @@ class Parser:
         return True if self.re_is_equal.match(value) else False
 
     def is_mult(self, value):
-        return value == '*'
+        return value in ['*', '∗']
 
     def split(self, line):
         return self.re_split.split(line)

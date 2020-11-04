@@ -19,7 +19,7 @@ class Poly:
         if not self._no_print:
             print(*args)
 
-    def get_poly_degres(self, degres) -> float:
+    def get_num_degres(self, degres) -> float:
         last = None
         for poly in self.data:
             if poly.is_operande:
@@ -45,7 +45,7 @@ class Poly0(Poly):
     """
 
     def resolve(self):
-        b = self.get_poly_degres(0)
+        b = self.get_num_degres(0)
         if b == 0:
             self.print("\tall solution are possible.")
             return "ALL"
@@ -60,10 +60,10 @@ class Poly1(Poly):
     """
 
     def resolve(self):
-        a = self.get_poly_degres(1)
-        b = self.get_poly_degres(0)
+        a = self.get_num_degres(1)
+        b = self.get_num_degres(0)
 
-        solution = -b / a if a != 0 else 0
+        solution = -b / a if a != 0 else "ALL"
         self.verbose(
             "calculate",
             f"\ta = {a}\n"
@@ -72,7 +72,10 @@ class Poly1(Poly):
             f"\tx\u00B9 = ({-b} / {a})\n"
             f"\tx\u00B9 = {solution}"
         )
-        self.print(f"\tsolution is \u2A10 = {solution}")
+        if a != 0:
+            self.print(f"\tsolution is \u2A10 = {solution}")
+        else:
+            self.print("\tall solution are possible.")
         return solution
 
 
@@ -82,9 +85,15 @@ class Poly2(Poly):
     """
 
     def calcul_delta(self, a, b, c):
-        return (b * b) - 4 * a * c
+        delta = (b * b) - 4 * a * c
+        veb = f"a = {a}\n\tb = {b}\n\tc = {c}\n\n" \
+              f"\t\u0394 = (b\u00B2 - 4) * a * c\n" \
+              f"\t\u0394 = ({b}\u00B2 - 4) * {a} * {c}\n" \
+              f"\t\u0394 = {delta}"
+        self.verbose("calculate delta", veb)
+        return delta
 
-    def delta_negative(self, delta):
+    def delta_negative(self, delta, a, b, c):
         self.verbose_force("result",
                            f"delta is lower than 0 ({ delta }), no solution possible."
                            )
@@ -132,20 +141,15 @@ class Poly2(Poly):
         return [x1, x2]
 
     def resolve(self):
-        a = self.get_poly_degres(2)
-        b = self.get_poly_degres(1)
-        c = self.get_poly_degres(0)
+        a = self.get_num_degres(2)
+        b = self.get_num_degres(1)
+        c = self.get_num_degres(0)
 
         delta = self.calcul_delta(a, b, c)
-        veb = f"a = {a}\n\tb = {b}\n\tc = {c}\n\n" \
-              f"\t\u0394 = (b\u00B2 - 4) * a * c\n" \
-              f"\t\u0394 = ({b}\u00B2 - 4) * {a} * {c}\n" \
-              f"\t\u0394 = {delta}"
-        self.verbose("calculate delta", veb)
 
         # call respective solution
         if delta < 0:
-            return self.delta_negative(delta)
+            return self.delta_negative(delta, a, b, c)
         elif delta == 0:
             return self.delta_zero(a, b, c)
         else:
