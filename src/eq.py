@@ -2,7 +2,7 @@ from .utils import DEFAULT_INDEFINITE
 
 
 class Eq:
-    is_operande = False
+    is_operator = False
     is_power = False
 
     def __init__(self, value: str):
@@ -15,8 +15,8 @@ class Eq:
         return str(self)
 
 
-class Operande(Eq):
-    is_operande = True
+class Operator(Eq):
+    is_operator = True
 
     def is_plus(self):
         return self.value in ["+"]

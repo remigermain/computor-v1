@@ -1,5 +1,5 @@
 from .utils import Color, MAX_DEGRES, DEFAULT_INDEFINITE
-from .eq import Power, Operande
+from .eq import Power, Operator
 from .poly import get_poly_class
 
 
@@ -32,11 +32,11 @@ class Resolver:
         new_second_data = [
             obj
             if obj.is_power else
-            Operande("-" if obj.is_plus() else "+")
+            Operator("-" if obj.is_plus() else "+")
             for obj in self._second_data
         ]
 
-        self._first_data.extend([Operande("-"), *new_second_data])
+        self._first_data.extend([Operator("-"), *new_second_data])
 
         self.verbose("merge equation", self.poly_str(
             self._first_data) + " = 0")
@@ -45,7 +45,7 @@ class Resolver:
         last_ope = None
 
         for poly in self._first_data[1:]:
-            if poly.is_operande:
+            if poly.is_operator:
                 last_ope = poly
             else:
                 f = list(filter(lambda x: x.is_power and x.degres ==
@@ -69,7 +69,7 @@ class Resolver:
         new_lst = []
         last = None
         for nxt in lst:
-            if nxt.is_operande:
+            if nxt.is_operator:
                 last = nxt
             elif nxt.num != 0:
                 if not last:

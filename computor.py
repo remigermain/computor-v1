@@ -56,8 +56,8 @@ def from_stdin(args):
         if new_line:
             print("")
         try:
-            line = input("enter your equation:  ")
-            if line.lower().strip() in ["break", "quit"]:
+            line = input("enter your equation (or tape \"exit\" to quit):  ")
+            if line.lower().strip() == "exit":
                 exit(1)
         except (KeyboardInterrupt, EOFError, UnboundLocalError):
             print("exit program ...")

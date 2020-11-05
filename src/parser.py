@@ -9,7 +9,7 @@ class Parser:
     def __init__(self, line, indefinite=utils.DEFAULT_INDEFINITE):
         self._inde = indefinite
         self._init_regex()
-        self.line = self.re_space.sub(" ", line)
+        self.line = self.re_space.sub(" ", line).strip()
         self.errors = error.Error(self.line)
 
     def _init_regex(self):
@@ -51,7 +51,7 @@ class Parser:
     def is_indefinite(self, value):
         return True if self.re_is_indefinite.match(value) else False
 
-    def is_operande(self, value):
+    def is_operator(self, value):
         return True if self.re_is_operande.match(value) else False
 
     def is_power(self, value):
@@ -115,7 +115,7 @@ class Parser:
                 l_digit = None
                 num, ope = True, False
 
-            elif self.is_operande(val):
+            elif self.is_operator(val):
                 if not num or ope:
                     self.errors.add_error(
                         self.errors.ERR_NEED_NUMBER_BF_OPERA, length, val)
@@ -124,7 +124,7 @@ class Parser:
                 if l_digit is not None:
                     data.append(eq.Power(l_digit, 0, indefinite=self._inde))
 
-                data.append(eq.Operande(val.strip()))
+                data.append(eq.Operator(val.strip()))
                 num, ope = False, True
 
             elif self.is_equal(val):

@@ -28,7 +28,7 @@ class Poly:
     def get_num_degres(self, degres) -> float:
         last = None
         for poly in self.data:
-            if poly.is_operande:
+            if poly.is_operator:
                 last = poly
             elif poly.degres == degres:
                 num = -1 if last and not last.is_plus() else 1

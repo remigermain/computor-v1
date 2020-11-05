@@ -6,7 +6,7 @@ class Test(unittest.TestCase):
 
     def assertParseEqual(self, l1, l2):
         for el1, el2 in zip(l1, l2):
-            if el1.is_operande:
+            if el1.is_operator:
                 self.assertEqual(el1.value, el2['value'])
             else:
                 self.assertEqual(el1.num, el2['num'])

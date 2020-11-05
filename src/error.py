@@ -41,6 +41,8 @@ class Error:
             "padding": len(l_strip.strip()),
             "message": self.get_message(idx)
         }
+        if op['start'] == 0 and op['padding'] == 0:
+            idx = "start"
         if idx not in self._errors:
             self._errors[idx] = [op]
         else:
@@ -65,7 +67,7 @@ class Error:
                     space += Color.RED + padd + Color.WHITE
                 if err['message'] not in messages:
                     messages.append(err['message'])
-            mess = '\n'.join(messages)
+            mess = '\n\t'.join(messages)
             if space:
                 print(f"\t{space}")
             print(f"\t{mess}")
