@@ -158,6 +158,9 @@ class Parser:
 
             length += len(val)
 
+        if l_digit is not None:
+            data.append(eq.Power(l_digit, 0, indefinite=self._inde))
+
         if not self.have_error:
             if not equal:
                 self.errors.add_error(self.errors.ERR_MISSING_EQ)
@@ -165,9 +168,8 @@ class Parser:
                 self.errors.add_error(self.errors.ERR_ENDING_OPE)
             if not num:
                 self.errors.add_error(self.errors.ERR_MATH_WRONG)
-
-        if l_digit is not None:
-            data.append(eq.Power(l_digit, 0, indefinite=self._inde))
+            if not len(self._second_data):
+                self.errors.add_error(self.errors.ERR_NOTHING_AF_EQUAL)
 
         return not self.have_error
 

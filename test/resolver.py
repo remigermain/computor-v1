@@ -28,12 +28,25 @@ class Test(unittest.TestCase):
         self.assertEqual(Result.ANY_POSSIBILITY, result)
 
     def test_any2(self):
+        result = self.get_result_from("1x^0 = 1x^0")
+        self.assertEqual(Result.ANY_POSSIBILITY, result)
+
+    def test_any3(self):
         result = self.get_result_from(
             "-1*x ^ 1 - -1*x ^ 1 = 2*x ^ 1 + - 1*x ^ 1 - 1*x ^ 1")
         self.assertEqual(Result.ANY_POSSIBILITY, result)
 
+    def test_real3(self):
+        result = self.get_result_from(
+            "1*x ^ 1 - -1*x ^ 1 = 2*x ^ 1 + - 1*x ^ 1 - 1*x ^ 1")
+        self.assertEqual(0.0, result)
+
     def test_impossible(self):
         result = self.get_result_from("5 * X^0 + 0 * X^1 = 4 * X^0")
+        self.assertEqual(Result.NO_SOLUTION, result)
+
+    def test_impossible2(self):
+        result = self.get_result_from("1x^0 = 2x^0")
         self.assertEqual(Result.NO_SOLUTION, result)
 
     def test_pdf(self):
@@ -56,7 +69,7 @@ class Test(unittest.TestCase):
 
     def test_eq(self):
         result = self.get_result_from("4 * X^0 + 3 * X^1 + X^2 = 0")
-        self.assertEqual(Result.ANY_POSSIBILITY, result)
+        self.assertEqual(Result.IMAGINAIRE_SOLUTION, result)
 
     def test_eq2(self):
         result = self.get_result_from(
@@ -76,6 +89,10 @@ class Test(unittest.TestCase):
     def test_eq5(self):
         result = self.get_result_from("4*x^2 = 4*x^2 + 1*x^1 - 1*x^1")
         self.assertEqual(Result.ANY_POSSIBILITY, result)
+
+    def test_eq6(self):
+        result = self.get_result_from("2x + 4 = x - 3")
+        self.assertEqual(-7.0, result)
 
 
 if __name__ == '__main__':

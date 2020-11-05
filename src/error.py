@@ -11,6 +11,7 @@ class Error:
         "ERR_NEED_NUMBER_AF_OPERA": "you need a number after operator.",
         "ERR_UNK": "unknow type.",
         "ERR_NOTHING_BF_EQUAL": "he have nothing valid before equal ...",
+        "ERR_NOTHING_AF_EQUAL": "he have nothing valid after equal ...",
         "ERR_MISSING_EQ": "missing equal.",
         "ERR_ENDING_OPE": "a calcul c\'ant ending by operator.",
         "ERR_MATH_WRONG": "Your math is wrong ..."

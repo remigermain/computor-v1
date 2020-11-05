@@ -4,6 +4,7 @@ from .utils import Color
 class Result:
     ANY_POSSIBILITY = "ANY_POSSIBILITY"
     NO_SOLUTION = "NO_SOLUTION"
+    IMAGINAIRE_SOLUTION = "IMAGINAIRE_SOLUTION"
 
 
 class Poly:
@@ -54,9 +55,8 @@ class Poly0(Poly):
         if b == 0:
             self.print("\tall solution are possible.")
             return Result.ANY_POSSIBILITY
-        else:
-            self.print("\the have no solution.")
-            return Result.NO_SOLUTION
+        self.print("\tno solution as possible.")
+        return Result.NO_SOLUTION
 
 
 class Poly1(Poly):
@@ -68,20 +68,22 @@ class Poly1(Poly):
         a = self.get_num_degres(1)
         b = self.get_num_degres(0)
 
-        solution = -b / a if a != 0 else Result.ANY_POSSIBILITY
-        self.verbose(
-            "calculate",
-            f"\ta = {a}\n"
-            f"\tb = {b}\n\n"
-            "\tx\u00B9 = (-b / a)\n"
-            f"\tx\u00B9 = ({-b} / {a})\n"
-            f"\tx\u00B9 = {solution}"
-        )
         if a != 0:
+            solution = -b / a
+            if solution == 0:
+                solution = 0
+            self.verbose(
+                "calculate",
+                f"a = {a}\n"
+                f"\tb = {b}\n\n"
+                "\tx\u00B9 = (-b / a)\n"
+                f"\tx\u00B9 = ({-b} / {a})\n"
+                f"\tx\u00B9 = {solution}"
+            )
             self.print(f"\tsolution is \u2A10 = {solution}")
-        else:
-            self.print("\tall solution are possible.")
-        return solution
+            return solution
+        self.print("\tall solution are possible.")
+        return Result.ANY_POSSIBILITY
 
 
 class Poly2(Poly):
@@ -99,11 +101,32 @@ class Poly2(Poly):
         return delta
 
     def delta_negative(self, delta, a, b, c):
+
         self.verbose_force("result",
-                           f"delta is lower than 0 ({ delta }), no solution possible."
+                           f"delta is lower than 0 ({ delta }), "
+                           f"the equation has two complex and conjugated solutions"
                            )
-        self.print("\tx = \u2205")
-        return Result.NO_SOLUTION
+
+        delta_sq = self.sqrt(-delta)
+
+        self.print(
+            f"\tx\u00B2 = (-b + i * \u221A\u0394) / (2 * a)\n"
+            f"\tx\u00B2 = ({-b} + i * \u221A{delta}) / (2 * {a})\n"
+            f"\tx\u00B2 = ({-b} + i * {delta_sq}) / {2 * a}\n"
+        )
+        self.print(
+            f"\tx\u00B9 = (-b - i * \u221A\u0394) / (2 * a)\n"
+            f"\tx\u00B9 = ({-b} - i * \u221A{delta}) / (2 * {a})\n"
+            f"\tx\u00B9 = ({-b} - i * {delta_sq}) / {2 * a}\n"
+        )
+        self.print(
+            "\n\tsolution is \u2A10{"
+            f"  (({-b} + i * {delta_sq}) / {2 * a})  ;  "
+            f"  (({-b} - i * {delta_sq}) / {2 * a})  "
+            "}"
+        )
+
+        return Result.IMAGINAIRE_SOLUTION
 
     def delta_zero(self, a, b, c):
         self.verbose_force("result", "delta is 0, only one solution")
@@ -121,8 +144,8 @@ class Poly2(Poly):
             "result", "delta is upper than 0, you have 2 solution")
         delta_sq = self.sqrt(delta)
 
-        eq = "\tx{res} = (-b {sign} \u221A\u0394) / (2 * a)\n"\
-             "\tx{res} = ({b} {sign} \u221A{delta}) / (2 * {a})"
+        eq = "\tx{res} = (-b {sign} \u221A\u0394) / (2 * a)\n"
+        "\tx{res} = ({b} {sign} \u221A{delta}) / (2 * {a})"
 
         data = {
             'a': a,

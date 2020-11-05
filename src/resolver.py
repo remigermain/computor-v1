@@ -32,9 +32,10 @@ class Resolver:
         new_second_data = [
             obj
             if obj.is_power else
-            Operande("-" if obj.is_plus() else "-")
+            Operande("-" if obj.is_plus() else "+")
             for obj in self._second_data
         ]
+
         self._first_data.extend([Operande("-"), *new_second_data])
 
         self.verbose("merge equation", self.poly_str(
@@ -58,16 +59,13 @@ class Resolver:
                         f[0].num += poly.num
                     else:
                         f[0].num -= poly.num
+
         return new_poly
 
     def remove_poly(self, lst):
         """
             remove all poly with zero
         """
-
-        if len(lst) == 1:
-            return lst
-
         new_lst = []
         last = None
         for nxt in lst:

@@ -19,7 +19,7 @@ class Operande(Eq):
     is_operande = True
 
     def is_plus(self):
-        return self.value == "+"
+        return self.value in ["+"]
 
     def __repr__(self):
         return "(plus)" if self.is_plus() else "(minus)"
