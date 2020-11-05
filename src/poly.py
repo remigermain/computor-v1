@@ -19,11 +19,12 @@ class Poly:
             print(f"{Color.YELLOW}{info.capitalize()}{Color.WHITE}:\n\t{message}\n")
 
     def verbose_force(self, info, message):
-        self.verbose(info, message, force=True)
-
-    def print(self, *args):
         if not self._no_print:
-            print(*args)
+            self.verbose(info, message, force=True)
+
+    def print(self, *args, **kwargs):
+        if not self._no_print:
+            print(*args, **kwargs)
 
     def get_num_degres(self, degres) -> float:
         last = None
@@ -53,9 +54,9 @@ class Poly0(Poly):
     def resolve(self):
         b = self.get_num_degres(0)
         if b == 0:
-            self.print("\tall solution are possible.")
+            self.verbose_force("solution", "all solution are possible.")
             return Result.ANY_POSSIBILITY
-        self.print("\tno solution as possible.")
+        self.verbose_force("solution", "no solution as possible.")
         return Result.NO_SOLUTION
 
 
@@ -80,9 +81,10 @@ class Poly1(Poly):
                 f"\tx\u00B9 = ({-b} / {a})\n"
                 f"\tx\u00B9 = {solution}"
             )
-            self.print(f"\tsolution is \u2A10 = {solution}")
+            self.verbose_force(
+                "solution", f"solution is \u2A10 = {solution}")
             return solution
-        self.print("\tall solution are possible.")
+        self.verbose_force("solution", "all solution are possible.")
         return Result.ANY_POSSIBILITY
 
 
@@ -102,7 +104,7 @@ class Poly2(Poly):
 
     def delta_negative(self, delta, a, b, c):
 
-        self.verbose_force("result",
+        self.verbose_force("solution",
                            f"delta is lower than 0 ({ delta }), "
                            f"the equation has two complex and conjugated solutions"
                            )
@@ -129,7 +131,7 @@ class Poly2(Poly):
         return Result.IMAGINAIRE_SOLUTION
 
     def delta_zero(self, a, b, c):
-        self.verbose_force("result", "delta is 0, only one solution")
+        self.verbose_force("solution", "delta is 0, only one solution")
         solution = -b / (2 * a) if a != 0 else 0
         self.print(
             f"\tx\u2070 = -b / ( 2 * a )\n"
@@ -141,7 +143,7 @@ class Poly2(Poly):
 
     def delta_positive(self, delta, a, b, c):
         self.verbose_force(
-            "result", "delta is upper than 0, you have 2 solution")
+            "solution", "delta is upper than 0, you have 2 solution")
         delta_sq = self.sqrt(delta)
 
         eq = "\tx{res} = (-b {sign} \u221A\u0394) / (2 * a)\n"
@@ -155,17 +157,19 @@ class Poly2(Poly):
         }
 
         # X1, first solution
-        self.print(eq.format(sign="-", res="\u00B9", ** data))
+        self.print(eq.format(sign="-", res="\u00B9", **data), end="")
         x1 = (-b - delta_sq) / (2 * a) if a != 0 else 0
+        x1 = x1 if x1 != 0 else 0
         self.print(f"\tx\u00B9 = {x1}\n")
 
         # X2, second solution
-        self.print(eq.format(sign="+", res="\u00B2", ** data))
+        self.print(eq.format(sign="+", res="\u00B2", ** data), end="")
         x2 = (-b + delta_sq) / (2 * a) if a != 0 else 0
+        x2 = x2 if x2 != 0 else 0
         self.print(f"\tx\u00B2 = {x2}\n")
 
         # resume solution
-        self.print("\n\tsolution is \u2A10{ " + f"{x1} ; {x2}" + " }")
+        self.print("\tsolution is \u2A10{ " + f"{x1} ; {x2}" + " }")
         return [x1, x2]
 
     def resolve(self):
