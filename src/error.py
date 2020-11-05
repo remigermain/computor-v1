@@ -5,16 +5,18 @@ class Error:
 
     message = {
         "ERR_EMPTY": 'String is empty.',
-        "ERR_NEED_OPERA": "you need a operator between number.",
-        "ERR_MAX_DEGRES": f"your degres is upper than {MAX_DEGRES}, c\'ant be resolve.",
-        "ERR_NEED_NUMBER_BF_OPERA": "you need a number befor operator.",
-        "ERR_NEED_NUMBER_AF_OPERA": "you need a number after operator.",
-        "ERR_UNK": "unknow type.",
-        "ERR_NOTHING_BF_EQUAL": "he have nothing valid before equal ...",
-        "ERR_NOTHING_AF_EQUAL": "he have nothing valid after equal ...",
-        "ERR_MISSING_EQ": "missing equal.",
-        "ERR_ENDING_OPE": "a calcul c\'ant ending by operator.",
-        "ERR_MATH_WRONG": "Your math is wrong ..."
+        "ERR_NEED_OPERA": "You need a operator between number.",
+        "ERR_MAX_DEGRES": f"Your degres is upper than {MAX_DEGRES}, c\'ant be resolve.",
+        "ERR_NEED_NUMBER_BF_OPERA": "You need a number befor operator.",
+        "ERR_NEED_NUMBER_AF_OPERA": "You need a number after operator.",
+        "ERR_UNK": "Unknow type.",
+        "ERR_NOTHING_BF_EQUAL": "He have nothing valid before equal ...",
+        "ERR_NOTHING_AF_EQUAL": "He have nothing valid after equal ...",
+        "ERR_MISSING_EQ": "Missing equal.",
+        "ERR_ENDING_OPE": "Equation c\'ant ending by operator.",
+        "ERR_MATH_WRONG": "Your math is wrong ...",
+        "ERR_POWER_FLOAT": "The power can't be a float.",
+        "ERR_POWER_NEG": "The power can't be negative."
     }
 
     _errors = {}

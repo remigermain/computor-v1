@@ -14,10 +14,11 @@ class Parser:
 
     def _init_regex(self):
         REG_DIGIT = r'\s*-?\s*\d+(?:\.\d+)?\s*'
+        REG_FLOAT = r'\s*-?\s*\d+\.\d+\s*'
         LETTER = "{ind1}{ind2}".format(
             ind1=self._inde.upper(), ind2=self._inde.lower())
         REG_LETTER = r'\s*[' + LETTER + r']\s*'
-        REG_POWER = REG_LETTER + r"(?:\s*\^\s*\d+\s*)?"
+        REG_POWER = REG_LETTER + r"(?:\s*\^\s*" + REG_DIGIT + f"\s*)?"
 
         REG_ALL = r'([=+]|(?<=[^-+−]\s)-|(?<=[^-+−])-|' + REG_POWER + \
             r'|' + REG_DIGIT + r'|\s+)'
@@ -31,6 +32,8 @@ class Parser:
 
         self.re_is_operande = re.compile(r'^\s*[-+−]\s*$')
         self.re_is_equal = re.compile(r"^=$")
+
+        self.re_is_float = re.compile(r'^' + REG_FLOAT + r'$')
 
         self.re_is_power = re.compile(
             r'^(' + REG_DIGIT + r'(' + REG_POWER + r')?|' + REG_POWER + r')$')
@@ -46,6 +49,9 @@ class Parser:
 
     def is_digit(self, value):
         return True if self.re_is_digit.match(value) else False
+
+    def is_float(self, value):
+        return True if self.re_is_float.match(value) else False
 
     def is_indefinite(self, value):
         return True if self.re_is_indefinite.match(value) else False
@@ -99,11 +105,21 @@ class Parser:
             elif self.is_power(val):
                 # split power , if power have not exposant , default is 1
                 _split = val.split("^")
-                degres = 1 if len(_split) != 2 else int(_split[1])
-
+                degres = 1
+                if len(_split) != 2:
+                    pass
+                elif self.is_float(_split[1]):
+                    self.errors.add_error(
+                        self.errors.ERR_POWER_FLOAT, length, val)
+                elif int(_split[1]) < 0:
+                    self.errors.add_error(
+                        self.errors.ERR_POWER_NEG, length, val)
+                else:
+                    degres = int(_split[1])
                 # if power has not number , default is 1
                 if l_digit is None:
                     l_digit = 1
+
                 data.append(eq.Power(l_digit, degres, indefinite=self._inde))
 
                 l_digit = None
