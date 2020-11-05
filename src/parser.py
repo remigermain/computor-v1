@@ -20,7 +20,7 @@ class Parser:
         REG_LETTER = r'\s*[' + LETTER + r']\s*'
         REG_POWER = REG_LETTER + r"(?:\s*\^\s*\d+\s*)?"
 
-        REG_ALL = r'([=+]|(?<=[^-]\s)-|' + REG_POWER + \
+        REG_ALL = r'([=+]|(?<=[^-+−]\s)-|(?<=[^-+−])-|' + REG_POWER + \
             r'|' + REG_DIGIT + r'|\s+)'
 
         self.re_split = re.compile(REG_ALL.format(
