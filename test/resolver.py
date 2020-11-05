@@ -135,6 +135,11 @@ class Test(unittest.TestCase):
         result = self.get_result_from("3x^3 + 44x^2 = 3x^3")
         self.assertEqual(0, result)
 
+    def test_loiberti_float_prob3(self):
+        result = self.get_result_from(
+            "0.9 * x^2 = 0.000000000000000000000000000000001 * x^3")
+        self.assertEqual(0, result)
+
 
 class Test2(unittest.TestCase):
 

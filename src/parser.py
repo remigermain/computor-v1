@@ -94,7 +94,7 @@ class Parser:
                         self.errors.ERR_NEED_OPERA, length, val)
 
                 # keep last digit, is will be set in operand or power
-                l_digit = float(val.replace(' ', ''))
+                l_digit = round(float(val.replace(' ', '')), 6)
                 num, ope = True, False
 
             elif self.is_power(val):

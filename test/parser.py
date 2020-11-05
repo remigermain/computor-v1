@@ -249,6 +249,11 @@ class Test(unittest.TestCase):
         parser = Parser("0.1 * X ^ 0 + 0.2 * X ^ 0 = 0.3 * X ^ 0")
         self.assertTrue(parser.is_valid())
 
+    def test_loiberti_float_prob3(self):
+        parser = Parser(
+            "0.9 * x^2 = 0.000000000000000000000000000000001 * x^3")
+        self.assertTrue(parser.is_valid())
+
     def test_loiberti_sing_prob(self):
         parser = Parser("1*x^1 - -1*x^1 = 2*x^1 +- 1*x^1 -+ 1*x^1")
         self.assertFalse(parser.is_valid())
