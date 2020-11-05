@@ -213,6 +213,58 @@ class Test(unittest.TestCase):
         parser = Parser("1x^1 1x^1 1x^1 ")
         self.assertFalse(parser.is_valid())
 
+    def test_loiberti_deg_float(self):
+        parser = Parser("4*x^3.1 = 0")
+        self.assertFalse(parser.is_valid())
+
+    def test_loiberti_deg_neg(self):
+        parser = Parser("4*x^-12 = 0")
+        self.assertFalse(parser.is_valid())
+
+    def test_loiberti_deg_one(self):
+        parser = Parser("40*x^0 - 12*x^1 = 4*x^0")
+        self.assertTrue(parser.is_valid())
+
+    def test_loiberti_deg_one_big(self):
+        parser = Parser("4*x ^ 4=0")
+        self.assertTrue(parser.is_valid())
+
+    def test_loiberti_delta_greater(self):
+        parser = Parser("5*x^0 + 4*x^1 - 9.3*x^2 = 1*x^0")
+        self.assertTrue(parser.is_valid())
+
+    def test_loiberti_delta_smaller(self):
+        parser = Parser("-2*x ^ 0 + 17*x ^ 1 - 4*x ^ 2 = 13*x ^ 1")
+        self.assertTrue(parser.is_valid())
+
+    def test_loiberti_delta_zero(self):
+        parser = Parser("1*x^0 + 17*x^1 + 4*x^2 = 13*x^1")
+        self.assertTrue(parser.is_valid())
+
+    def test_loiberti_float_prob_1(self):
+        parser = Parser("0.9 * x^2 = 0.2 * x^1 + 0.1 * x^1 - 0.3 * x^1")
+        self.assertTrue(parser.is_valid())
+
+    def test_loiberti_float_prob_2(self):
+        parser = Parser("0.1 * X ^ 0 + 0.2 * X ^ 0 = 0.3 * X ^ 0")
+        self.assertTrue(parser.is_valid())
+
+    def test_loiberti_sing_prob(self):
+        parser = Parser("1*x^1 - -1*x^1 = 2*x^1 +- 1*x^1 -+ 1*x^1")
+        self.assertFalse(parser.is_valid())
+
+    def test_loiberti_special(self):
+        parser = Parser("4*x^2 + 43*x^1 = 4*x^2 + 43*x^1")
+        self.assertTrue(parser.is_valid())
+
+    def test_loiberti_special2(self):
+        parser = Parser("5 * X^0 + 0 * X^1 = 4 * X^0")
+        self.assertTrue(parser.is_valid())
+
+    def test_loiberti_special3(self):
+        parser = Parser("-0*x^0 = 0")
+        self.assertTrue(parser.is_valid())
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -132,7 +132,10 @@ class Poly2(Poly):
 
     def delta_zero(self, a, b, c):
         self.verbose_force("solution", "delta is 0, only one solution")
+
         solution = -b / (2 * a) if a != 0 else 0
+        solution = solution if solution != 0 else 0
+
         self.print(
             f"\tx\u2070 = -b / ( 2 * a )\n"
             f"\tx\u2070 = {-b} / ( 2 * {a} )\n"

@@ -14,12 +14,17 @@ def parse_line(args, eq):
     }
     if parser.is_valid():
         data = parser.validated_data
-        obj['resolve'] = Resolver(
+        resolver = Resolver(
             data,
             verbose=args.verbose,
             no_print=args.minimal,
             indefinite=args.define_indefinite
         )
+        if resolver.is_valid():
+            obj['resolve'] = resolver
+        else:
+            obj['errors'] = resolver.get_errors()
+            obj['have_error'] = True
     else:
         obj['errors'] = parser.get_errors()
         obj['have_error'] = True
@@ -41,8 +46,7 @@ def print_results(args, results):
             r['errors'].print_error()
         else:
             resolver = r['resolve']
-            resolver.resolve()
-            result = resolver.generate_result()
+            result = resolver.resolve()
             if args.minimal:
                 result = result if isinstance(result, list) else [result]
                 for r in result:

@@ -19,7 +19,7 @@ class Error:
 
     _errors = {}
 
-    def __init__(self, line):
+    def __init__(self, line=None):
         self.line = line
         self._keys = list(self.message.keys())
         for idx, attr in enumerate(self._keys):
