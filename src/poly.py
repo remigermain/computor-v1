@@ -8,6 +8,9 @@ class Result:
 
 
 class Poly:
+    """
+        default class for polynomial resolver
+    """
 
     def __init__(self, data, verbose=False, no_print=False):
         self.data = data
@@ -26,13 +29,17 @@ class Poly:
         if not self._no_print:
             print(*args, **kwargs)
 
+    def normalize_solution(self, num):
+        # slove result negative zero to positive zero
+        return num if num != 0 else 0
+
     def get_num_degres(self, degres) -> float:
         last = None
         for poly in self.data:
             if poly.is_operator:
                 last = poly
             elif poly.degres == degres:
-                num = -1 if last and not last.is_plus() else 1
+                num = 1 if not last or last.is_plus() else -1
                 return poly.num * num
         return 0.0
 
@@ -70,9 +77,7 @@ class Poly1(Poly):
         b = self.get_num_degres(0)
 
         if a != 0:
-            solution = -b / a
-            if solution == 0:
-                solution = 0
+            solution = self.normalize_solution(-b / a)
             self.verbose(
                 "calculate",
                 f"a = {a}\n"
@@ -133,8 +138,7 @@ class Poly2(Poly):
     def delta_zero(self, a, b, c):
         self.verbose_force("solution", "delta is 0, only one solution")
 
-        solution = -b / (2 * a) if a != 0 else 0
-        solution = solution if solution != 0 else 0
+        solution = self.normalize_solution(-b / (2 * a) if a != 0 else 0)
 
         self.print(
             f"\tx\u2070 = -b / ( 2 * a )\n"
@@ -161,14 +165,14 @@ class Poly2(Poly):
 
         # X1, first solution
         self.print(eq.format(sign="-", res="\u00B9", **data), end="")
-        x1 = (-b - delta_sq) / (2 * a) if a != 0 else 0
-        x1 = x1 if x1 != 0 else 0
+        x1 = self.normalize_solution(
+            (-b - delta_sq) / (2 * a) if a != 0 else 0)
         self.print(f"\tx\u00B9 = {x1}\n")
 
         # X2, second solution
         self.print(eq.format(sign="+", res="\u00B2", ** data), end="")
-        x2 = (-b + delta_sq) / (2 * a) if a != 0 else 0
-        x2 = x2 if x2 != 0 else 0
+        x2 = self.normalize_solution(
+            (-b + delta_sq) / (2 * a) if a != 0 else 0)
         self.print(f"\tx\u00B2 = {x2}\n")
 
         # resume solution

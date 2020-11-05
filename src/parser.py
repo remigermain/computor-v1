@@ -13,7 +13,6 @@ class Parser:
         self.errors = error.Error(self.line)
 
     def _init_regex(self):
-        # TODO fix negative number
         REG_DIGIT = r'\s*-?\s*\d+(?:\.\d+)?\s*'
         LETTER = "{ind1}{ind2}".format(
             ind1=self._inde.upper(), ind2=self._inde.lower())
@@ -105,10 +104,6 @@ class Parser:
                 # if power has not number , default is 1
                 if l_digit is None:
                     l_digit = 1
-
-                # # degres c'ant be upper than max degres
-                # if degres > utils.MAX_DEGRES:
-                #     self.errors.add_error(self.errors.ERR_MAX_DEGRES, length, val)
                 data.append(eq.Power(l_digit, degres, indefinite=self._inde))
 
                 l_digit = None

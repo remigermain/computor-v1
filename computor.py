@@ -5,6 +5,7 @@ from src.parser import Parser
 from src.resolver import Resolver
 import argparse
 import sys
+import string
 
 
 def parse_line(args, eq):
@@ -33,7 +34,9 @@ def parse_line(args, eq):
 
 def validate_indefinite(value):
     if not value.isalpha() or len(value) != 1:
-        raise ValueError(f"you can only set one char, not {value}")
+        raise argparse.ArgumentTypeError(
+            f"you can only set one char, not \"{value}\"."
+        )
     return value
 
 
@@ -76,35 +79,34 @@ def from_args(args):
 
 
 def main():
+
     _argparse = argparse.ArgumentParser(
-        "computor",
-        "computor v1: [falgs] equations...",
-        f"solves a polynomial equation of lower or equal degree {MAX_DEGRES}"
+        description=f"solves a polynomial equation of lower or equal degree {MAX_DEGRES}."
     )
     _argparse.add_argument(
         "-v",
         "--verbose",
-        help="display more information during parsing and resolve",
+        help="display more information during parsing and resolve.",
         action="store_true",
         default=False
     )
     _argparse.add_argument(
         "-m",
         "--minimal",
-        help="display only result (disabled verboser flag)",
+        help="display only result (disabled verboser flag).",
         action="store_true",
         default=False
     )
     _argparse.add_argument(
         "-d",
         "--define-indefinite",
-        help="change the indefinite letter",
-        type=validate_indefinite,
-        action="store",
+        help=f"change the indefinite letter, default \"{DEFAULT_INDEFINITE}\" (insensitive case).",
+        type=str,
+        choices=list(string.ascii_lowercase),
         default=DEFAULT_INDEFINITE
     )
     _argparse.add_argument('equations', nargs='*')
-    args = _argparse.parse_args(sys.argv[1:])  # remove name programe
+    args = _argparse.parse_args(sys.argv[1:])
 
     # check have one equation in args
     if not len(args.equations):

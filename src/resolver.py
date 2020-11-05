@@ -80,13 +80,16 @@ class Resolver:
                     new_lst.append(nxt)
                 else:
                     new_lst.extend([last, nxt])
+
         if len(new_lst) == 0:
             return [Power(0, 0, indefinite=self._ind)]
+
         # remove operator alone
         if new_lst[0].is_operator:
             del new_lst[0]
         if new_lst[-1].is_operator:
             del new_lst[-1]
+
         return new_lst
 
     def find_degres(self, lst):
