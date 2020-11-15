@@ -18,8 +18,14 @@ class Eq:
 class Operator(Eq):
     is_operator = True
 
+    def __init__(self, value):
+        super().__init__(value)
+        self._is_plus = None
+
     def is_plus(self):
-        return self.value in ["+"]
+        if self._is_plus is None:
+            self._is_plus = self.value in ["+"]
+        return self._is_plus
 
     def __repr__(self):
         return "(plus)" if self.is_plus() else "(minus)"

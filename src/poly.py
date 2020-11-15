@@ -2,6 +2,9 @@ from .utils import Color
 
 
 class Result:
+    """
+        return result for test
+    """
     ANY_POSSIBILITY = "ANY_POSSIBILITY"
     NO_SOLUTION = "NO_SOLUTION"
     IMAGINAIRE_SOLUTION = "IMAGINAIRE_SOLUTION"
