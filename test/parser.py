@@ -270,6 +270,9 @@ class Test(unittest.TestCase):
         parser = Parser("-0*x^0 = 0")
         self.assertTrue(parser.is_valid())
 
+    def test_error_1(self):
+        parser = Parser("xx = x")
+        self.assertFalse(parser.is_valid())
 
 if __name__ == '__main__':
     unittest.main()

@@ -106,6 +106,9 @@ class Parser:
                 # split power , if power have not exposant , default is 1
                 _split = val.split("^")
                 degres = 1
+                if len(data) != 0 and not data[-1].is_operator:
+                    self.errors.add_error(
+                        self.errors.ERR_NEED_OPERA, length, val)
                 if len(_split) != 2:
                     pass
                 elif self.is_float(_split[1]):
@@ -195,5 +198,5 @@ class Parser:
                 "you c'ant access validated data before running is_valid()")
         if self._valid is False:
             raise ValueError("you c'ant access validated data is not valid")
-
+        
         return self._first_data, self._second_data
